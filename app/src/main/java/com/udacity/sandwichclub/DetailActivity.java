@@ -3,6 +3,7 @@ package com.udacity.sandwichclub;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -11,12 +12,16 @@ import com.squareup.picasso.Picasso;
 import com.udacity.sandwichclub.model.Sandwich;
 import com.udacity.sandwichclub.utils.JsonUtils;
 
+import java.util.List;
+
 public class DetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_POSITION = "extra_position";
     private static final int DEFAULT_POSITION = -1;
+
+
     //Declare views that will hold the data
-    private Sandwich sandwich;
+    private Sandwich mSandwich;
     private ImageView mIngredientsIv;
     private TextView mMainNameTv;
     private TextView mMainNameLb;
@@ -65,8 +70,8 @@ public class DetailActivity extends AppCompatActivity {
 
         String[] sandwiches = getResources().getStringArray(R.array.sandwich_details);
         String json = sandwiches[position];
-        Sandwich sandwich = JsonUtils.parseSandwichJson(json);
-        if (sandwich == null) {
+        mSandwich = JsonUtils.parseSandwichJson(json);
+        if (mSandwich == null) {
             // Sandwich data unavailable
             closeOnError();
             return;
@@ -74,10 +79,10 @@ public class DetailActivity extends AppCompatActivity {
 
         populateUI();
         Picasso.with(this)
-                .load(sandwich.getImage())
+                .load(mSandwich.getImage())
                 .into(mIngredientsIv);
 
-        setTitle(sandwich.getMainName());
+        setTitle(mSandwich.getMainName());
     }
 
     private void closeOnError() {
@@ -87,10 +92,55 @@ public class DetailActivity extends AppCompatActivity {
 
     private void populateUI() {
 
+
         // Set value to Text
+        setTextToTextView(mSandwich.getMainName(), mMainNameTv, mMainNameLb);
+        setTextToTextView(mSandwich.getPlaceOfOrigin(), mPlaceOfOriginTv, mPlaceOfOriginLb);
+        setTextToTextView(mSandwich.getDescription(), mDescriptionTv, mDescriptionLb);
 
 
         // Set value to list
+        setListToTextView(mSandwich.getAlsoKnownAs(), mAlsoKnownAsTv, mAlsoKnownAsLb);
+        setListToTextView(mSandwich.getIngredients(), mIngredientTv, mIngredientLb);
+
+
 
     }
+    private void setTextToTextView(String textValue, TextView viewTv, View viewLb) {
+        if (textValue.isEmpty() ) {
+            viewTv.setVisibility(View.GONE);
+            viewLb.setVisibility(View.GONE);
+        } else {
+            viewTv.setText(textValue);
+        }
+    }
+
+    private void setListToTextView(List<String> listValue, TextView viewTv, View viewLb) {
+        if (listValue == null) {
+            viewTv.setVisibility(View.GONE);
+            viewLb.setVisibility(View.GONE);
+        } else {
+            if(listValue.size() > 0) {
+                StringBuilder listString = new StringBuilder();
+
+
+                for (int i = 0; i < listValue.size(); i++) {
+
+                    listString.append(listValue.get(i));
+                    if(i < (listValue.size()-1)) {
+                        listString.append("-" );
+                    }
+                }
+                viewTv.setText(listString.toString());
+            }
+            else{
+                viewTv.setText("Unknown");
+
+            }
+        }
+
+    }
+
 }
+
+
